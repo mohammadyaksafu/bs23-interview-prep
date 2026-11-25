@@ -220,6 +220,35 @@ body.lang-bn .viz-cap .ce{display:none}
 .pkid.on{transform:translateY(-3px)}
 .pkid.on .bub{opacity:1;transform:none}
 .pkid.on .pbox{border-color:var(--accent);background:var(--accent-soft)}
+/* ---------- coding problems ---------- */
+.tag.easy{color:var(--accent);background:var(--accent-soft)}
+.tag.med{color:var(--warn);background:var(--warn-soft)}
+.tag.pat{color:var(--muted);background:var(--code-bg);text-transform:none;letter-spacing:0}
+.cp-done{margin-left:auto;display:inline-flex;gap:6px;align-items:center;font:500 13px var(--f-body);color:var(--muted);cursor:pointer}
+.card.cp.solved{border-color:var(--accent)}
+.card.cp.solved h3 .n::after{content:" ✓";color:var(--accent)}
+.cp-ex{margin-top:.5rem}
+.cp-sol{margin-top:14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
+.cp-sol>summary{cursor:pointer;padding:10px 14px;font:600 14px var(--f-body);color:var(--accent);list-style:none;display:flex;align-items:center;gap:8px}
+.cp-sol>summary::-webkit-details-marker{display:none}
+.cp-sol>summary::before{content:"▸";transition:transform .25s}
+.cp-sol[open]>summary::before{transform:rotate(90deg)}
+.cp-sol[open]>summary{border-bottom:1px solid var(--line)}
+.cp-sol[open]>*:not(summary){animation:fade .35s ease}
+.cp-sol>.en,.cp-sol>.bn,.cp-sol>.cp-tabs,.cp-sol>.cp-code,.cp-sol>.cp-cx{margin-left:14px;margin-right:14px}
+.cp-sol>.en{margin-top:12px}
+.cp-sol>.en p{margin:.2rem 0}
+.cp-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.cp-tabs button{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:7px;padding:5px 12px;font:500 13px var(--f-body);cursor:pointer}
+.cp-tabs .cp-copy{margin-left:auto;color:var(--muted)}
+body[data-code="cpp"] .cp-tabs [data-cl="cpp"],body[data-code="java"] .cp-tabs [data-cl="java"],body[data-code="py"] .cp-tabs [data-cl="py"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.cp-code pre{display:none;margin-top:8px}
+body[data-code="cpp"] .cp-code pre.cpp,body[data-code="java"] .cp-code pre.java,body[data-code="py"] .cp-code pre.py{display:block}
+.cp-cx{font-size:14px;margin:4px 14px 14px}
+.cp-prog{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:-6px 0 16px;font-size:14px;color:var(--muted)}
+.cp-prog b{color:var(--fg)}
+.cp-bar{flex:1 1 160px;max-width:320px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.cp-bar i{display:block;height:100%;background:var(--accent);transition:width .5s ease}
 /* ---------- mock test ---------- */
 .bn-i{font-family:var(--f-bn);color:var(--muted);font-weight:400}
 body.lang-en .bn-i{display:none}
@@ -1410,6 +1439,1227 @@ steps:[
 const VIZMAP=[['What is Polymorphism','poly','Polymorphism'],['Stack vs Queue','stackq','Stack vs Queue'],['Hashing:','hash','Hash table'],['Sliding window','window','Sliding window'],['Two pointers','twoptr','Two pointers'],['Sorting algorithms','bubble','Bubble sort'],['Binary search','bsearch','Binary search'],['Recursion basics','recur','Recursion'],['Output-tracing','incr','i++ vs ++i'],['Array vs String basics','lsearch','Linear search'],['Explain SQL JOIN','joins','SQL joins'],['What is Normalization','norm','Normalization'],['What is a Deadlock','deadlock','Deadlock'],['CPU scheduling','rr','Round Robin'],['TCP vs UDP','tcp','TCP handshake'],['What happens when you type','url','Typing a URL'],['Explain the event loop','evloop','Event loop']];
 const ANIMS=[];
 
+/* ================= CODING PROBLEMS (C++ / Java / Python) ================= */
+const escH = s => String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const R = String.raw;
+const CODING = [
+/* ---------- Strings ---------- */
+{t:`Valid palindrome (ignore case and symbols)`, d:`Easy`, p:`Two pointers`,
+s:`Return true if the string reads the same forwards and backwards after ignoring case and every character that is not a letter or digit.`,
+ex:`Input:  "A man, a plan, a canal: Panama"\nOutput: true\nInput:  "race a car"\nOutput: false`,
+sb:`বড়/ছোট হাতের অক্ষর এবং অক্ষর-সংখ্যা ছাড়া অন্য সব চিহ্ন বাদ দিয়ে স্ট্রিংটি সামনে-পেছনে একই কিনা (palindrome) যাচাই করুন।`,
+a:`Put one pointer at each end. Skip anything that is not a letter or digit, compare the two characters in lower case, and move both pointers inward. Any mismatch means false.`,
+ab:`দুই প্রান্তে দুটি পয়েন্টার রাখুন। অক্ষর বা সংখ্যা না হলে সেটা বাদ দিয়ে এগিয়ে যান, ছোট হাতের অক্ষরে তুলনা করুন, তারপর দুটো পয়েন্টারই ভেতরের দিকে সরান। কোথাও না মিললে false।`,
+cx:`O(n) time, O(1) extra space.`,
+cpp:R`bool isPalindrome(const string& s) {
+    int i = 0, j = (int)s.size() - 1;
+    while (i < j) {
+        if (!isalnum(s[i])) { i++; continue; }
+        if (!isalnum(s[j])) { j--; continue; }
+        if (tolower(s[i]) != tolower(s[j])) return false;
+        i++; j--;
+    }
+    return true;
+}`,
+java:R`boolean isPalindrome(String s) {
+    int i = 0, j = s.length() - 1;
+    while (i < j) {
+        char a = s.charAt(i), b = s.charAt(j);
+        if (!Character.isLetterOrDigit(a)) { i++; continue; }
+        if (!Character.isLetterOrDigit(b)) { j--; continue; }
+        if (Character.toLowerCase(a) != Character.toLowerCase(b)) return false;
+        i++; j--;
+    }
+    return true;
+}`,
+py:R`def is_palindrome(s):
+    i, j = 0, len(s) - 1
+    while i < j:
+        if not s[i].isalnum():
+            i += 1
+        elif not s[j].isalnum():
+            j -= 1
+        elif s[i].lower() != s[j].lower():
+            return False
+        else:
+            i += 1
+            j -= 1
+    return True`},
+
+{t:`Count vowels, consonants, digits and spaces`, d:`Easy`, p:`String traversal`,
+s:`Given a sentence, print how many vowels, consonants, digits and spaces it contains.`,
+ex:`Input:  "Hello World 2024"\nOutput: vowels=3 consonants=7 digits=4 spaces=2`,
+sb:`একটি বাক্যে কতগুলো স্বরবর্ণ (vowel), ব্যঞ্জনবর্ণ (consonant), অংক ও স্পেস আছে তা গুনুন।`,
+a:`Walk through each character once. Convert to lower case; if it is a letter, check whether it is in "aeiou". Otherwise check for a digit or a space.`,
+ab:`প্রতিটি অক্ষর একবার করে দেখুন। ছোট হাতের অক্ষরে রূপান্তর করে অক্ষর হলে "aeiou"-তে আছে কিনা দেখুন; না হলে অংক বা স্পেস কিনা দেখুন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`void countChars(const string& s) {
+    int v = 0, c = 0, d = 0, sp = 0;
+    for (char ch : s) {
+        char x = tolower(ch);
+        if (x >= 'a' && x <= 'z') {
+            if (string("aeiou").find(x) != string::npos) v++;
+            else c++;
+        } else if (isdigit(ch)) d++;
+        else if (ch == ' ') sp++;
+    }
+    cout << "vowels=" << v << " consonants=" << c
+         << " digits=" << d << " spaces=" << sp << "\n";
+}`,
+java:R`void countChars(String s) {
+    int v = 0, c = 0, d = 0, sp = 0;
+    for (char ch : s.toLowerCase().toCharArray()) {
+        if (ch >= 'a' && ch <= 'z') {
+            if ("aeiou".indexOf(ch) >= 0) v++;
+            else c++;
+        } else if (Character.isDigit(ch)) d++;
+        else if (ch == ' ') sp++;
+    }
+    System.out.println("vowels=" + v + " consonants=" + c
+        + " digits=" + d + " spaces=" + sp);
+}`,
+py:R`def count_chars(s):
+    v = c = d = sp = 0
+    for ch in s.lower():
+        if 'a' <= ch <= 'z':
+            if ch in 'aeiou':
+                v += 1
+            else:
+                c += 1
+        elif ch.isdigit():
+            d += 1
+        elif ch == ' ':
+            sp += 1
+    print(f"vowels={v} consonants={c} digits={d} spaces={sp}")`},
+
+{t:`Reverse the words in a sentence`, d:`Easy`, p:`String split`,
+s:`Reverse the order of words. Remove extra spaces so words are separated by exactly one space.`,
+ex:`Input:  "  the sky   is blue "\nOutput: "blue is sky the"`,
+sb:`বাক্যের শব্দগুলোর ক্রম উল্টে দিন (অক্ষর নয়, শব্দ)। বাড়তি স্পেস বাদ দিয়ে শব্দের মাঝে একটি করে স্পেস রাখুন।`,
+a:`Split the sentence into words (splitting on any run of spaces drops the extras), then join the words from last to first with single spaces.`,
+ab:`স্পেস দিয়ে ভাগ করে শব্দগুলোর তালিকা বানান (এতে বাড়তি স্পেস বাদ যায়), তারপর শেষ থেকে প্রথম পর্যন্ত একটি স্পেস দিয়ে জোড়া লাগান।`,
+cx:`O(n) time, O(n) space.`,
+cpp:R`string reverseWords(const string& s) {
+    stringstream ss(s);
+    vector<string> words;
+    string w;
+    while (ss >> w) words.push_back(w);   // >> skips extra spaces
+    string res;
+    for (int i = (int)words.size() - 1; i >= 0; i--) {
+        res += words[i];
+        if (i > 0) res += ' ';
+    }
+    return res;
+}`,
+java:R`String reverseWords(String s) {
+    String[] w = s.trim().split("\\s+");
+    StringBuilder sb = new StringBuilder();
+    for (int i = w.length - 1; i >= 0; i--) {
+        sb.append(w[i]);
+        if (i > 0) sb.append(' ');
+    }
+    return sb.toString();
+}`,
+py:R`def reverse_words(s):
+    words = s.split()          # split() with no argument drops extra spaces
+    return ' '.join(reversed(words))`},
+
+{t:`Check if one string is a rotation of another`, d:`Easy`, p:`String trick`,
+s:`Return true if <code>b</code> can be made by rotating <code>a</code> (moving some characters from the front to the back).`,
+ex:`Input:  a = "ABCD", b = "CDAB"\nOutput: true\nInput:  a = "ABCD", b = "ACBD"\nOutput: false`,
+sb:`a-কে ঘুরিয়ে (সামনের কিছু অক্ষর পেছনে নিয়ে) b বানানো যায় কিনা যাচাই করুন।`,
+a:`Every rotation of a appears inside a + a ("ABCDABCD" contains "CDAB"). So check that the lengths are equal and that b is a substring of a + a.`,
+ab:`a-এর সব rotation a + a-এর ভেতরে থাকে ("ABCDABCD"-এ "CDAB" আছে)। তাই দৈর্ঘ্য সমান কিনা এবং b, a + a-এর অংশ কিনা দেখলেই হয়।`,
+cx:`O(n) space; the substring search is O(n²) in the worst case, or O(n) with KMP.`,
+cpp:R`bool isRotation(const string& a, const string& b) {
+    return a.size() == b.size() && (a + a).find(b) != string::npos;
+}`,
+java:R`boolean isRotation(String a, String b) {
+    return a.length() == b.length() && (a + a).contains(b);
+}`,
+py:R`def is_rotation(a, b):
+    return len(a) == len(b) and b in a + a`},
+
+{t:`Longest substring without repeating characters`, d:`Medium`, p:`Sliding window`,
+s:`Find the length of the longest substring that has no repeated characters.`,
+ex:`Input:  "abcabcbb"\nOutput: 3   ("abc")\nInput:  "pwwkew"\nOutput: 3   ("wke")`,
+sb:`এমন সবচেয়ে লম্বা সাবস্ট্রিংয়ের দৈর্ঘ্য বের করুন যেখানে কোনো অক্ষর দুবার নেই।`,
+a:`Keep a window [left, r] with no duplicates and remember the last index of each character. When s[r] was already seen inside the window, jump left to just after that earlier position. Track the largest window.`,
+ab:`একটা উইন্ডো [left, r] রাখুন যেখানে কোনো অক্ষর পুনরাবৃত্তি নেই, আর প্রতিটি অক্ষর শেষ কোথায় দেখা গেছে তা মনে রাখুন। s[r] উইন্ডোর ভেতরে আগে থাকলে left-কে সেই জায়গার ঠিক পরে নিয়ে যান। সবচেয়ে বড় উইন্ডোর দৈর্ঘ্যই উত্তর।`,
+cx:`O(n) time, O(alphabet size) space.`,
+cpp:R`int lengthOfLongestSubstring(const string& s) {
+    vector<int> last(256, -1);
+    int best = 0, left = 0;
+    for (int r = 0; r < (int)s.size(); r++) {
+        unsigned char c = s[r];
+        if (last[c] >= left) left = last[c] + 1;   // repeat inside window
+        last[c] = r;
+        best = max(best, r - left + 1);
+    }
+    return best;
+}`,
+java:R`int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> last = new HashMap<>();
+    int best = 0, left = 0;
+    for (int r = 0; r < s.length(); r++) {
+        char c = s.charAt(r);
+        if (last.containsKey(c) && last.get(c) >= left) left = last.get(c) + 1;
+        last.put(c, r);
+        best = Math.max(best, r - left + 1);
+    }
+    return best;
+}`,
+py:R`def length_of_longest_substring(s):
+    last, left, best = {}, 0, 0
+    for r, c in enumerate(s):
+        if last.get(c, -1) >= left:     # repeat inside the window
+            left = last[c] + 1
+        last[c] = r
+        best = max(best, r - left + 1)
+    return best`},
+
+{t:`Longest repeating character replacement (LeetCode 424)`, d:`Medium`, p:`Sliding window`, rep:1,
+s:`Given an upper-case string and an integer <code>k</code>, you may replace at most <code>k</code> characters. Return the length of the longest substring that contains only one repeated letter. This exact problem was reported in a BS23 coding round.`,
+ex:`Input:  s = "AABABBA", k = 1\nOutput: 4   ("AABA" -> "AAAA")\nInput:  s = "ABAB", k = 2\nOutput: 4`,
+sb:`বড় হাতের অক্ষরের একটি স্ট্রিং ও k দেওয়া আছে; সর্বোচ্চ k-টি অক্ষর বদলানো যাবে। বদলানোর পর একই অক্ষরের সবচেয়ে লম্বা সাবস্ট্রিংয়ের দৈর্ঘ্য বের করুন। এই প্রশ্নটি BS23-এর কোডিং রাউন্ডে এসেছে বলে রিপোর্ট আছে।`,
+a:`A window is valid when (window length − count of its most frequent letter) ≤ k, because those are the letters you must replace. Grow the window to the right; while it is invalid, shrink from the left. The animation in the DSA section walks through this example.`,
+ab:`উইন্ডোর দৈর্ঘ্য থেকে সবচেয়ে বেশি থাকা অক্ষরের সংখ্যা বাদ দিলে যতগুলো অক্ষর বদলাতে হবে তা পাওয়া যায়; এটা ≤ k হলে উইন্ডো বৈধ। ডান দিকে উইন্ডো বাড়ান, অবৈধ হলে বাম দিক থেকে ছোট করুন। DSA অংশের অ্যানিমেশনে এই উদাহরণটি ধাপে ধাপে দেখানো আছে।`,
+cx:`O(n) time, O(26) space.`,
+cpp:R`int characterReplacement(const string& s, int k) {
+    int cnt[26] = {0}, maxf = 0, left = 0, best = 0;
+    for (int r = 0; r < (int)s.size(); r++) {
+        maxf = max(maxf, ++cnt[s[r] - 'A']);
+        while ((r - left + 1) - maxf > k)       // too many to replace
+            cnt[s[left++] - 'A']--;
+        best = max(best, r - left + 1);
+    }
+    return best;
+}`,
+java:R`int characterReplacement(String s, int k) {
+    int[] cnt = new int[26];
+    int maxf = 0, left = 0, best = 0;
+    for (int r = 0; r < s.length(); r++) {
+        maxf = Math.max(maxf, ++cnt[s.charAt(r) - 'A']);
+        while ((r - left + 1) - maxf > k)
+            cnt[s.charAt(left++) - 'A']--;
+        best = Math.max(best, r - left + 1);
+    }
+    return best;
+}`,
+py:R`def character_replacement(s, k):
+    cnt, maxf, left, best = {}, 0, 0, 0
+    for r, c in enumerate(s):
+        cnt[c] = cnt.get(c, 0) + 1
+        maxf = max(maxf, cnt[c])
+        while (r - left + 1) - maxf > k:   # too many to replace
+            cnt[s[left]] -= 1
+            left += 1
+        best = max(best, r - left + 1)
+    return best`},
+
+{t:`Valid parentheses`, d:`Easy`, p:`Stack`,
+s:`Given a string of <code>()[]{}</code>, return true if every bracket is closed by the same type in the correct order.`,
+ex:`Input:  "{[()]}"\nOutput: true\nInput:  "([)]"\nOutput: false`,
+sb:`()[]{} দিয়ে তৈরি স্ট্রিংয়ে প্রতিটি ব্র্যাকেট সঠিক ধরনের ব্র্যাকেট দিয়ে সঠিক ক্রমে বন্ধ হয়েছে কিনা যাচাই করুন।`,
+a:`Push every opening bracket. For a closing bracket, the stack must not be empty and its top must be the matching opener; pop it. At the end the stack must be empty.`,
+ab:`খোলা ব্র্যাকেট পেলে stack-এ push করুন। বন্ধ ব্র্যাকেট পেলে stack খালি হওয়া চলবে না এবং উপরেরটা মিলতে হবে; তারপর pop করুন। শেষে stack খালি থাকলে valid।`,
+cx:`O(n) time, O(n) space.`,
+cpp:R`bool isValid(const string& s) {
+    stack<char> st;
+    for (char c : s) {
+        if (c == '(' || c == '[' || c == '{') st.push(c);
+        else {
+            if (st.empty()) return false;
+            char t = st.top(); st.pop();
+            if ((c == ')' && t != '(') || (c == ']' && t != '[') ||
+                (c == '}' && t != '{')) return false;
+        }
+    }
+    return st.empty();
+}`,
+java:R`boolean isValid(String s) {
+    Deque<Character> st = new ArrayDeque<>();
+    for (char c : s.toCharArray()) {
+        if (c == '(' || c == '[' || c == '{') st.push(c);
+        else {
+            if (st.isEmpty()) return false;
+            char t = st.pop();
+            if ((c == ')' && t != '(') || (c == ']' && t != '[') ||
+                (c == '}' && t != '{')) return false;
+        }
+    }
+    return st.isEmpty();
+}`,
+py:R`def is_valid(s):
+    pair = {')': '(', ']': '[', '}': '{'}
+    st = []
+    for c in s:
+        if c in '([{':
+            st.append(c)
+        elif not st or st.pop() != pair[c]:
+            return False
+    return not st`},
+
+{t:`String compression (run-length encoding)`, d:`Easy`, p:`Two pointers`,
+s:`Replace every run of the same character with the character followed by the run length.`,
+ex:`Input:  "aaabbc"\nOutput: "a3b2c1"\nInput:  "abcd"\nOutput: "a1b1c1d1"`,
+sb:`পরপর একই অক্ষর যতবার আছে, সেটাকে অক্ষর + সংখ্যা দিয়ে লিখুন (যেমন "aaabbc" → "a3b2c1")।`,
+a:`From position i, move j forward while s[j] equals s[i]. The run length is j − i. Append the character and the count, then continue from j.`,
+ab:`i থেকে শুরু করে যতক্ষণ s[j] == s[i], ততক্ষণ j বাড়ান। j − i হলো সেই অক্ষর কতবার আছে। অক্ষর ও সংখ্যা যোগ করে j থেকে আবার শুরু করুন।`,
+cx:`O(n) time, O(n) for the output.`,
+cpp:R`string compress(const string& s) {
+    string res;
+    int n = s.size();
+    for (int i = 0; i < n; ) {
+        int j = i;
+        while (j < n && s[j] == s[i]) j++;
+        res += s[i];
+        res += to_string(j - i);
+        i = j;
+    }
+    return res;
+}`,
+java:R`String compress(String s) {
+    StringBuilder sb = new StringBuilder();
+    int n = s.length();
+    for (int i = 0; i < n; ) {
+        int j = i;
+        while (j < n && s.charAt(j) == s.charAt(i)) j++;
+        sb.append(s.charAt(i)).append(j - i);
+        i = j;
+    }
+    return sb.toString();
+}`,
+py:R`def compress(s):
+    res, i = [], 0
+    while i < len(s):
+        j = i
+        while j < len(s) and s[j] == s[i]:
+            j += 1
+        res.append(s[i] + str(j - i))
+        i = j
+    return ''.join(res)`},
+
+{t:`Longest common prefix`, d:`Easy`, p:`String traversal`,
+s:`Find the longest prefix shared by all strings in an array. Return an empty string if there is none.`,
+ex:`Input:  ["flower", "flow", "flight"]\nOutput: "fl"\nInput:  ["dog", "car"]\nOutput: ""`,
+sb:`একটি স্ট্রিং অ্যারের সব স্ট্রিংয়ের শুরুতে যে অংশটা একই, তার সবচেয়ে লম্বা রূপ বের করুন।`,
+a:`Compare column by column: for each index i of the first word, check that every word has the same character at i. Stop at the first mismatch or when a word ends.`,
+ab:`কলাম ধরে তুলনা করুন: প্রথম শব্দের প্রতিটি ইনডেক্স i-তে সব শব্দের অক্ষর একই কিনা দেখুন। প্রথম অমিল বা কোনো শব্দ শেষ হলেই থামুন।`,
+cx:`O(total characters) time, O(1) extra space.`,
+cpp:R`string longestCommonPrefix(const vector<string>& v) {
+    if (v.empty()) return "";
+    for (int i = 0; i < (int)v[0].size(); i++)
+        for (const string& w : v)
+            if (i >= (int)w.size() || w[i] != v[0][i])
+                return v[0].substr(0, i);
+    return v[0];
+}`,
+java:R`String longestCommonPrefix(String[] v) {
+    if (v.length == 0) return "";
+    for (int i = 0; i < v[0].length(); i++)
+        for (String w : v)
+            if (i >= w.length() || w.charAt(i) != v[0].charAt(i))
+                return v[0].substring(0, i);
+    return v[0];
+}`,
+py:R`def longest_common_prefix(words):
+    if not words:
+        return ""
+    for i, ch in enumerate(words[0]):
+        for w in words:
+            if i >= len(w) or w[i] != ch:
+                return words[0][:i]
+    return words[0]`},
+
+{t:`Group anagrams`, d:`Medium`, p:`Hash map`,
+s:`Group words that are anagrams of each other (same letters, different order).`,
+ex:`Input:  ["eat","tea","tan","ate","nat","bat"]\nOutput: [["eat","tea","ate"], ["tan","nat"], ["bat"]]`,
+sb:`যে শব্দগুলো একই অক্ষর দিয়ে তৈরি (শুধু ক্রম ভিন্ন), সেগুলোকে একটি গ্রুপে রাখুন।`,
+a:`Anagrams become identical when their letters are sorted ("eat", "tea" → "aet"). Use the sorted word as a hash-map key and append each word to its key's list.`,
+ab:`অক্ষরগুলো সাজালে anagram-গুলো একই হয়ে যায় ("eat", "tea" → "aet")। সাজানো শব্দকে HashMap-এর key বানিয়ে প্রতিটি শব্দ সেই key-এর তালিকায় রাখুন।`,
+cx:`O(n · k log k) time for n words of length k; O(n · k) space.`,
+cpp:R`vector<vector<string>> groupAnagrams(const vector<string>& words) {
+    unordered_map<string, vector<string>> g;
+    for (const string& w : words) {
+        string key = w;
+        sort(key.begin(), key.end());
+        g[key].push_back(w);
+    }
+    vector<vector<string>> res;
+    for (auto& entry : g) res.push_back(entry.second);
+    return res;
+}`,
+java:R`List<List<String>> groupAnagrams(String[] words) {
+    Map<String, List<String>> g = new HashMap<>();
+    for (String w : words) {
+        char[] c = w.toCharArray();
+        Arrays.sort(c);
+        g.computeIfAbsent(new String(c), x -> new ArrayList<>()).add(w);
+    }
+    return new ArrayList<>(g.values());
+}`,
+py:R`from collections import defaultdict
+
+def group_anagrams(words):
+    g = defaultdict(list)
+    for w in words:
+        g[''.join(sorted(w))].append(w)
+    return list(g.values())`},
+
+/* ---------- Arrays ---------- */
+{t:`Remove duplicates from a sorted array (in place)`, d:`Easy`, p:`Two pointers`,
+s:`The array is sorted. Keep each value once at the front of the array and return how many unique values there are. Do not use another array.`,
+ex:`Input:  [0,0,1,1,1,2,2,3]\nOutput: 4, array starts with [0,1,2,3]`,
+sb:`সাজানো অ্যারে থেকে ডুপ্লিকেট সরিয়ে প্রতিটি মান একবার করে সামনে রাখুন এবং ইউনিক মানের সংখ্যা ফেরত দিন। নতুন অ্যারে ব্যবহার করা যাবে না।`,
+a:`k is where the next unique value goes. Because the array is sorted, a[i] is new exactly when it differs from the last kept value a[k − 1].`,
+ab:`k হলো পরের ইউনিক মান রাখার জায়গা। অ্যারে সাজানো, তাই a[i] যদি সর্বশেষ রাখা মান a[k − 1] থেকে আলাদা হয়, তবেই সেটা নতুন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`int removeDuplicates(vector<int>& a) {
+    if (a.empty()) return 0;
+    int k = 1;
+    for (int i = 1; i < (int)a.size(); i++)
+        if (a[i] != a[k - 1]) a[k++] = a[i];
+    return k;
+}`,
+java:R`int removeDuplicates(int[] a) {
+    if (a.length == 0) return 0;
+    int k = 1;
+    for (int i = 1; i < a.length; i++)
+        if (a[i] != a[k - 1]) a[k++] = a[i];
+    return k;
+}`,
+py:R`def remove_duplicates(a):
+    if not a:
+        return 0
+    k = 1
+    for i in range(1, len(a)):
+        if a[i] != a[k - 1]:
+            a[k] = a[i]
+            k += 1
+    return k`},
+
+{t:`Move all zeros to the end`, d:`Easy`, p:`Two pointers`,
+s:`Move every 0 to the end of the array while keeping the order of the other elements. Do it in place.`,
+ex:`Input:  [0,1,0,3,12]\nOutput: [1,3,12,0,0]`,
+sb:`অন্য উপাদানগুলোর ক্রম ঠিক রেখে সব 0 অ্যারের শেষে সরিয়ে দিন, নতুন অ্যারে ছাড়া।`,
+a:`Copy every non-zero value forward to position k (k only moves when a non-zero is written), then fill the rest with zeros.`,
+ab:`প্রতিটি non-zero মান k অবস্থানে লিখুন এবং k বাড়ান। শেষে বাকি জায়গাগুলো 0 দিয়ে ভরে দিন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`void moveZeroes(vector<int>& a) {
+    int k = 0;
+    for (int i = 0; i < (int)a.size(); i++)
+        if (a[i] != 0) a[k++] = a[i];
+    while (k < (int)a.size()) a[k++] = 0;
+}`,
+java:R`void moveZeroes(int[] a) {
+    int k = 0;
+    for (int i = 0; i < a.length; i++)
+        if (a[i] != 0) a[k++] = a[i];
+    while (k < a.length) a[k++] = 0;
+}`,
+py:R`def move_zeroes(a):
+    k = 0
+    for i in range(len(a)):
+        if a[i] != 0:
+            a[k], a[i] = a[i], a[k]
+            k += 1`},
+
+{t:`Rotate an array to the right by k`, d:`Medium`, p:`Reversal trick`,
+s:`Rotate the array to the right by <code>k</code> steps, in place.`,
+ex:`Input:  [1,2,3,4,5,6,7], k = 3\nOutput: [5,6,7,1,2,3,4]`,
+sb:`অ্যারেটিকে ডান দিকে k ধাপ ঘুরিয়ে দিন, নতুন অ্যারে ছাড়া।`,
+a:`Reverse the whole array, then reverse the first k elements, then reverse the rest. [1..7] → [7,6,5,4,3,2,1] → [5,6,7 | 4,3,2,1] → [5,6,7,1,2,3,4]. Use k % n first in case k is larger than n.`,
+ab:`পুরো অ্যারে উল্টান, তারপর প্রথম k-টি উল্টান, তারপর বাকিগুলো উল্টান। k যদি n-এর চেয়ে বড় হয়, আগে k % n করে নিন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`void rotate(vector<int>& a, int k) {
+    int n = a.size();
+    if (n == 0) return;
+    k %= n;
+    reverse(a.begin(), a.end());
+    reverse(a.begin(), a.begin() + k);
+    reverse(a.begin() + k, a.end());
+}`,
+java:R`void rotate(int[] a, int k) {
+    int n = a.length;
+    if (n == 0) return;
+    k %= n;
+    reverse(a, 0, n - 1);
+    reverse(a, 0, k - 1);
+    reverse(a, k, n - 1);
+}
+
+void reverse(int[] a, int i, int j) {
+    while (i < j) { int t = a[i]; a[i++] = a[j]; a[j--] = t; }
+}`,
+py:R`def rotate(a, k):
+    n = len(a)
+    if n == 0:
+        return
+    k %= n
+    a.reverse()
+    a[:k] = reversed(a[:k])
+    a[k:] = reversed(a[k:])`},
+
+{t:`Maximum subarray sum (Kadane's algorithm)`, d:`Medium`, p:`Dynamic programming`,
+s:`Find the largest sum of any contiguous subarray (at least one element).`,
+ex:`Input:  [-2,1,-3,4,-1,2,1,-5,4]\nOutput: 6   (subarray [4,-1,2,1])`,
+sb:`পরপর থাকা উপাদানগুলোর (subarray) সর্বোচ্চ যোগফল বের করুন।`,
+a:`At each element decide: start a new subarray here, or extend the previous one. cur = max(x, cur + x). If the running sum became negative it can only hurt, so starting fresh wins. best tracks the maximum cur.`,
+ab:`প্রতিটি উপাদানে সিদ্ধান্ত নিন: এখান থেকে নতুন শুরু করবেন, নাকি আগেরটার সাথে যোগ করবেন। cur = max(x, cur + x)। আগের যোগফল ঋণাত্মক হলে নতুন শুরু করাই ভালো। best-এ সর্বোচ্চ cur রাখুন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`int maxSubArray(const vector<int>& a) {
+    int cur = a[0], best = a[0];
+    for (int i = 1; i < (int)a.size(); i++) {
+        cur = max(a[i], cur + a[i]);
+        best = max(best, cur);
+    }
+    return best;
+}`,
+java:R`int maxSubArray(int[] a) {
+    int cur = a[0], best = a[0];
+    for (int i = 1; i < a.length; i++) {
+        cur = Math.max(a[i], cur + a[i]);
+        best = Math.max(best, cur);
+    }
+    return best;
+}`,
+py:R`def max_sub_array(a):
+    cur = best = a[0]
+    for x in a[1:]:
+        cur = max(x, cur + x)
+        best = max(best, cur)
+    return best`},
+
+{t:`Best time to buy and sell a stock`, d:`Easy`, p:`Single pass`,
+s:`prices[i] is the stock price on day i. Buy on one day and sell on a later day. Return the maximum profit, or 0 if no profit is possible.`,
+ex:`Input:  [7,1,5,3,6,4]\nOutput: 5   (buy at 1, sell at 6)`,
+sb:`prices[i] হলো i-তম দিনের দাম। একদিন কিনে পরের কোনো দিন বিক্রি করে সর্বোচ্চ লাভ বের করুন; লাভ না হলে 0।`,
+a:`Scan once, remembering the lowest price so far. On each day, the best profit if you sell today is price − lowest. Keep the maximum.`,
+ab:`একবার স্ক্যান করুন এবং এখন পর্যন্ত সর্বনিম্ন দাম মনে রাখুন। প্রতিদিন আজ বিক্রি করলে লাভ = দাম − সর্বনিম্ন দাম; সর্বোচ্চটা রাখুন।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`int maxProfit(const vector<int>& p) {
+    int minP = INT_MAX, best = 0;
+    for (int x : p) {
+        minP = min(minP, x);
+        best = max(best, x - minP);
+    }
+    return best;
+}`,
+java:R`int maxProfit(int[] p) {
+    int minP = Integer.MAX_VALUE, best = 0;
+    for (int x : p) {
+        minP = Math.min(minP, x);
+        best = Math.max(best, x - minP);
+    }
+    return best;
+}`,
+py:R`def max_profit(prices):
+    min_p, best = float('inf'), 0
+    for x in prices:
+        min_p = min(min_p, x)
+        best = max(best, x - min_p)
+    return best`},
+
+{t:`Merge two sorted arrays`, d:`Easy`, p:`Two pointers`,
+s:`Merge two sorted arrays into one sorted array.`,
+ex:`Input:  [1,3,5,7] and [2,4,6]\nOutput: [1,2,3,4,5,6,7]`,
+sb:`দুটি সাজানো অ্যারে মিলিয়ে একটি সাজানো অ্যারে বানান।`,
+a:`Keep one pointer in each array and always take the smaller current element. When one array runs out, copy the rest of the other. This is the merge step of merge sort.`,
+ab:`দুই অ্যারেতে দুটি পয়েন্টার রাখুন, প্রতিবার ছোট উপাদানটা নিন। একটি শেষ হলে অন্যটির বাকিগুলো কপি করুন। এটাই merge sort-এর merge ধাপ।`,
+cx:`O(n + m) time, O(n + m) space for the result.`,
+cpp:R`vector<int> mergeSorted(const vector<int>& a, const vector<int>& b) {
+    vector<int> r;
+    int i = 0, j = 0, n = a.size(), m = b.size();
+    while (i < n && j < m) r.push_back(a[i] <= b[j] ? a[i++] : b[j++]);
+    while (i < n) r.push_back(a[i++]);
+    while (j < m) r.push_back(b[j++]);
+    return r;
+}`,
+java:R`int[] mergeSorted(int[] a, int[] b) {
+    int[] r = new int[a.length + b.length];
+    int i = 0, j = 0, k = 0;
+    while (i < a.length && j < b.length) r[k++] = a[i] <= b[j] ? a[i++] : b[j++];
+    while (i < a.length) r[k++] = a[i++];
+    while (j < b.length) r[k++] = b[j++];
+    return r;
+}`,
+py:R`def merge_sorted(a, b):
+    r, i, j = [], 0, 0
+    while i < len(a) and j < len(b):
+        if a[i] <= b[j]:
+            r.append(a[i]); i += 1
+        else:
+            r.append(b[j]); j += 1
+    return r + a[i:] + b[j:]`},
+
+{t:`Majority element (Boyer–Moore voting)`, d:`Easy`, p:`Voting`,
+s:`One value appears more than n / 2 times. Find it using O(1) extra space.`,
+ex:`Input:  [2,2,1,1,1,2,2]\nOutput: 2`,
+sb:`একটি মান n / 2-এর চেয়ে বেশিবার আছে। O(1) অতিরিক্ত জায়গা ব্যবহার করে সেটি বের করুন।`,
+a:`Keep a candidate and a counter. Same value: +1, different value: −1. When the counter hits 0, take the current value as the new candidate. The majority survives because it outnumbers all other values combined.`,
+ab:`একটি candidate আর একটি counter রাখুন। একই মান হলে +1, ভিন্ন হলে −1। counter 0 হলে বর্তমান মানকে নতুন candidate ধরুন। Majority মান বাকি সবার মোট সংখ্যার চেয়ে বেশি, তাই শেষে সেটাই থাকে।`,
+cx:`O(n) time, O(1) space. (A hash map count also works in O(n) space.)`,
+cpp:R`int majorityElement(const vector<int>& a) {
+    int cand = 0, count = 0;
+    for (int x : a) {
+        if (count == 0) cand = x;
+        count += (x == cand) ? 1 : -1;
+    }
+    return cand;
+}`,
+java:R`int majorityElement(int[] a) {
+    int cand = 0, count = 0;
+    for (int x : a) {
+        if (count == 0) cand = x;
+        count += (x == cand) ? 1 : -1;
+    }
+    return cand;
+}`,
+py:R`def majority_element(a):
+    cand, count = None, 0
+    for x in a:
+        if count == 0:
+            cand = x
+        count += 1 if x == cand else -1
+    return cand`},
+
+{t:`Product of array except self (no division)`, d:`Medium`, p:`Prefix / suffix`,
+s:`Return an array where each position holds the product of all other elements. Do not use division.`,
+ex:`Input:  [1,2,3,4]\nOutput: [24,12,8,6]`,
+sb:`প্রতিটি অবস্থানে নিজেকে বাদ দিয়ে বাকি সব উপাদানের গুণফল রাখুন। ভাগ (division) ব্যবহার করা যাবে না।`,
+a:`The answer at i is (product of everything left of i) × (product of everything right of i). First pass left to right stores the left products; second pass right to left multiplies in the right products.`,
+ab:`i-এর উত্তর = i-এর বাম পাশের সবকিছুর গুণফল × ডান পাশের সবকিছুর গুণফল। প্রথম লুপে বাম দিকের গুণফল রাখুন, দ্বিতীয় লুপে ডান দিক থেকে গুণ করুন।`,
+cx:`O(n) time, O(1) extra space besides the output.`,
+cpp:R`vector<int> productExceptSelf(const vector<int>& a) {
+    int n = a.size();
+    vector<int> res(n, 1);
+    int left = 1;
+    for (int i = 0; i < n; i++) { res[i] = left; left *= a[i]; }
+    int right = 1;
+    for (int i = n - 1; i >= 0; i--) { res[i] *= right; right *= a[i]; }
+    return res;
+}`,
+java:R`int[] productExceptSelf(int[] a) {
+    int n = a.length;
+    int[] res = new int[n];
+    int left = 1;
+    for (int i = 0; i < n; i++) { res[i] = left; left *= a[i]; }
+    int right = 1;
+    for (int i = n - 1; i >= 0; i--) { res[i] *= right; right *= a[i]; }
+    return res;
+}`,
+py:R`def product_except_self(a):
+    n = len(a)
+    res = [1] * n
+    left = 1
+    for i in range(n):
+        res[i] = left
+        left *= a[i]
+    right = 1
+    for i in range(n - 1, -1, -1):
+        res[i] *= right
+        right *= a[i]
+    return res`},
+
+{t:`Container with most water`, d:`Medium`, p:`Two pointers`,
+s:`height[i] is the height of a vertical line at x = i. Pick two lines that, with the x-axis, hold the most water. Return that area.`,
+ex:`Input:  [1,8,6,2,5,4,8,3,7]\nOutput: 49   (lines at index 1 and 8: min(8,7) × 7)`,
+sb:`height[i] হলো i অবস্থানে একটি খাড়া রেখার উচ্চতা। এমন দুটি রেখা বাছুন যাদের মাঝে সবচেয়ে বেশি পানি ধরে; সেই ক্ষেত্রফল ফেরত দিন।`,
+a:`Start with the widest pair (both ends). Area = min(height) × width. Then move the pointer at the shorter line inward: the shorter line limits the area, so keeping it can never give a bigger result.`,
+ab:`সবচেয়ে চওড়া জোড়া (দুই প্রান্ত) দিয়ে শুরু করুন। ক্ষেত্রফল = ছোট উচ্চতা × প্রস্থ। তারপর ছোট রেখার পয়েন্টারটি ভেতরে সরান, কারণ ছোট রেখাটাই সীমা ঠিক করে – সেটা রেখে দিলে বড় ফল পাওয়া সম্ভব নয়।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`int maxArea(const vector<int>& h) {
+    int i = 0, j = (int)h.size() - 1, best = 0;
+    while (i < j) {
+        best = max(best, min(h[i], h[j]) * (j - i));
+        if (h[i] < h[j]) i++;
+        else j--;
+    }
+    return best;
+}`,
+java:R`int maxArea(int[] h) {
+    int i = 0, j = h.length - 1, best = 0;
+    while (i < j) {
+        best = Math.max(best, Math.min(h[i], h[j]) * (j - i));
+        if (h[i] < h[j]) i++;
+        else j--;
+    }
+    return best;
+}`,
+py:R`def max_area(h):
+    i, j, best = 0, len(h) - 1, 0
+    while i < j:
+        best = max(best, min(h[i], h[j]) * (j - i))
+        if h[i] < h[j]:
+            i += 1
+        else:
+            j -= 1
+    return best`},
+
+{t:`First and last position of a value (binary search)`, d:`Medium`, p:`Binary search`,
+s:`In a sorted array, find the first and last index of <code>target</code>. Return [-1, -1] if it is missing. Must be O(log n).`,
+ex:`Input:  [5,7,7,8,8,10], target = 8\nOutput: [3, 4]`,
+sb:`সাজানো অ্যারেতে target-এর প্রথম ও শেষ ইনডেক্স বের করুন; না থাকলে [-1, -1]। সময় O(log n) হতে হবে।`,
+a:`Run binary search twice. When a[mid] == target, record mid and keep searching: to the left for the first position, to the right for the last. Use lo + (hi − lo) / 2 to avoid overflow.`,
+ab:`দুবার binary search চালান। a[mid] == target হলে mid লিখে রাখুন এবং খোঁজা চালিয়ে যান: প্রথমটার জন্য বামে, শেষটার জন্য ডানে। overflow এড়াতে lo + (hi − lo) / 2 ব্যবহার করুন।`,
+cx:`O(log n) time, O(1) space.`,
+cpp:R`int bound(const vector<int>& a, int t, bool first) {
+    int lo = 0, hi = (int)a.size() - 1, ans = -1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (a[mid] == t) {
+            ans = mid;
+            if (first) hi = mid - 1; else lo = mid + 1;
+        } else if (a[mid] < t) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    return ans;
+}
+
+vector<int> searchRange(const vector<int>& a, int t) {
+    return { bound(a, t, true), bound(a, t, false) };
+}`,
+java:R`int bound(int[] a, int t, boolean first) {
+    int lo = 0, hi = a.length - 1, ans = -1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (a[mid] == t) {
+            ans = mid;
+            if (first) hi = mid - 1; else lo = mid + 1;
+        } else if (a[mid] < t) lo = mid + 1;
+        else hi = mid - 1;
+    }
+    return ans;
+}
+
+int[] searchRange(int[] a, int t) {
+    return new int[]{ bound(a, t, true), bound(a, t, false) };
+}`,
+py:R`def bound(a, t, first):
+    lo, hi, ans = 0, len(a) - 1, -1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if a[mid] == t:
+            ans = mid
+            if first:
+                hi = mid - 1
+            else:
+                lo = mid + 1
+        elif a[mid] < t:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return ans
+
+def search_range(a, t):
+    return [bound(a, t, True), bound(a, t, False)]`},
+
+{t:`Rotate a square matrix 90° clockwise`, d:`Medium`, p:`2D array`,
+s:`Rotate an n × n matrix 90 degrees clockwise, in place.`,
+ex:`Input:  [[1,2,3],\n         [4,5,6],\n         [7,8,9]]\nOutput: [[7,4,1],\n         [8,5,2],\n         [9,6,3]]`,
+sb:`n × n ম্যাট্রিক্সকে ঘড়ির কাঁটার দিকে 90° ঘুরিয়ে দিন, নতুন ম্যাট্রিক্স ছাড়া।`,
+a:`Transpose (swap m[i][j] with m[j][i], turning rows into columns), then reverse each row. Together these two steps equal a clockwise rotation.`,
+ab:`প্রথমে transpose করুন (m[i][j] ও m[j][i] অদলবদল, সারি কলাম হয়ে যায়), তারপর প্রতিটি সারি উল্টে দিন। এই দুই ধাপ মিলে 90° ঘোরানো হয়।`,
+cx:`O(n²) time, O(1) space.`,
+cpp:R`void rotate(vector<vector<int>>& m) {
+    int n = m.size();
+    for (int i = 0; i < n; i++)
+        for (int j = i + 1; j < n; j++)
+            swap(m[i][j], m[j][i]);              // transpose
+    for (auto& row : m)
+        reverse(row.begin(), row.end());          // mirror each row
+}`,
+java:R`void rotate(int[][] m) {
+    int n = m.length;
+    for (int i = 0; i < n; i++)
+        for (int j = i + 1; j < n; j++) {
+            int t = m[i][j]; m[i][j] = m[j][i]; m[j][i] = t;
+        }
+    for (int[] row : m)
+        for (int l = 0, r = n - 1; l < r; l++, r--) {
+            int t = row[l]; row[l] = row[r]; row[r] = t;
+        }
+}`,
+py:R`def rotate(m):
+    n = len(m)
+    for i in range(n):
+        for j in range(i + 1, n):
+            m[i][j], m[j][i] = m[j][i], m[i][j]   # transpose
+    for row in m:
+        row.reverse()                             # mirror each row`},
+
+/* ---------- Math & numbers ---------- */
+{t:`FizzBuzz`, d:`Easy`, p:`Loops & modulo`,
+s:`Print 1 to n. For multiples of 3 print "Fizz", for multiples of 5 print "Buzz", and for multiples of both print "FizzBuzz".`,
+ex:`Input:  n = 15\nOutput: 1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz`,
+sb:`1 থেকে n প্রিন্ট করুন। 3-এর গুণিতক হলে "Fizz", 5-এর গুণিতক হলে "Buzz", দুটোরই গুণিতক হলে "FizzBuzz"।`,
+a:`Check the "both" case (divisible by 15) first. If you check 3 first, 15 would print only "Fizz". This is the classic test of condition order.`,
+ab:`আগে "দুটোই" (15 দিয়ে বিভাজ্য) চেক করুন। আগে 3 চেক করলে 15-এর জন্য শুধু "Fizz" প্রিন্ট হবে। শর্তের ক্রম ঠিক রাখাই এখানে পরীক্ষা।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`void fizzBuzz(int n) {
+    for (int i = 1; i <= n; i++) {
+        if (i % 15 == 0) cout << "FizzBuzz\n";
+        else if (i % 3 == 0) cout << "Fizz\n";
+        else if (i % 5 == 0) cout << "Buzz\n";
+        else cout << i << "\n";
+    }
+}`,
+java:R`void fizzBuzz(int n) {
+    for (int i = 1; i <= n; i++) {
+        if (i % 15 == 0) System.out.println("FizzBuzz");
+        else if (i % 3 == 0) System.out.println("Fizz");
+        else if (i % 5 == 0) System.out.println("Buzz");
+        else System.out.println(i);
+    }
+}`,
+py:R`def fizz_buzz(n):
+    for i in range(1, n + 1):
+        if i % 15 == 0:
+            print("FizzBuzz")
+        elif i % 3 == 0:
+            print("Fizz")
+        elif i % 5 == 0:
+            print("Buzz")
+        else:
+            print(i)`},
+
+{t:`All primes up to n (Sieve of Eratosthenes)`, d:`Easy`, p:`Math`,
+s:`Return every prime number from 2 to n.`,
+ex:`Input:  n = 30\nOutput: 2 3 5 7 11 13 17 19 23 29`,
+sb:`2 থেকে n পর্যন্ত সব মৌলিক সংখ্যা (prime) বের করুন।`,
+a:`Assume every number is prime. For each prime i, cross out its multiples starting from i × i (smaller multiples were already crossed out by smaller primes). Whatever is never crossed out is prime.`,
+ab:`ধরে নিন সব সংখ্যা prime। প্রতিটি prime i-এর গুণিতকগুলো i × i থেকে কেটে দিন (ছোট গুণিতকগুলো আগেই ছোট prime দিয়ে কাটা হয়েছে)। যেগুলো কাটা পড়েনি সেগুলোই prime।`,
+cx:`O(n log log n) time, O(n) space. Much faster than checking each number separately.`,
+cpp:R`vector<int> sieve(int n) {
+    vector<bool> isPrime(n + 1, true);
+    vector<int> primes;
+    for (int i = 2; i <= n; i++) {
+        if (!isPrime[i]) continue;
+        primes.push_back(i);
+        for (long long j = (long long)i * i; j <= n; j += i)
+            isPrime[j] = false;
+    }
+    return primes;
+}`,
+java:R`List<Integer> sieve(int n) {
+    boolean[] composite = new boolean[n + 1];
+    List<Integer> primes = new ArrayList<>();
+    for (int i = 2; i <= n; i++) {
+        if (composite[i]) continue;
+        primes.add(i);
+        for (long j = (long) i * i; j <= n; j += i)
+            composite[(int) j] = true;
+    }
+    return primes;
+}`,
+py:R`def sieve(n):
+    is_prime = [True] * (n + 1)
+    primes = []
+    for i in range(2, n + 1):
+        if is_prime[i]:
+            primes.append(i)
+            for j in range(i * i, n + 1, i):
+                is_prime[j] = False
+    return primes`},
+
+{t:`Armstrong number`, d:`Easy`, p:`Digits`,
+s:`A number is an Armstrong number if the sum of its digits, each raised to the power of the number of digits, equals the number itself.`,
+ex:`Input:  153\nOutput: true   (1³ + 5³ + 3³ = 153)\nInput:  123\nOutput: false`,
+sb:`সংখ্যার প্রতিটি অংকের উপর অংকসংখ্যার ঘাত দিয়ে যোগ করলে যদি সংখ্যাটিই পাওয়া যায়, তবে সেটা Armstrong number (যেমন 153 = 1³ + 5³ + 3³)।`,
+a:`Count the digits first. Then take digits off with % 10 and / 10, raise each to that power, and add them up.`,
+ab:`প্রথমে অংকসংখ্যা গুনুন। তারপর % 10 ও / 10 দিয়ে একটা একটা অংক বের করে ঘাত দিয়ে যোগ করুন।`,
+cx:`O(d²) time for d digits (tiny), O(1) space.`,
+cpp:R`bool isArmstrong(int n) {
+    int digits = to_string(n).size(), sum = 0, t = n;
+    while (t > 0) {
+        int d = t % 10, p = 1;
+        for (int i = 0; i < digits; i++) p *= d;
+        sum += p;
+        t /= 10;
+    }
+    return sum == n;
+}`,
+java:R`boolean isArmstrong(int n) {
+    int digits = String.valueOf(n).length(), sum = 0, t = n;
+    while (t > 0) {
+        int d = t % 10, p = 1;
+        for (int i = 0; i < digits; i++) p *= d;
+        sum += p;
+        t /= 10;
+    }
+    return sum == n;
+}`,
+py:R`def is_armstrong(n):
+    s = str(n)
+    return n == sum(int(d) ** len(s) for d in s)`},
+
+{t:`Decimal to binary, and count set bits`, d:`Easy`, p:`Bit manipulation`,
+s:`Convert a non-negative integer to its binary string, and count how many 1-bits it has.`,
+ex:`Input:  13\nOutput: "1101", set bits = 3`,
+sb:`একটি অঋণাত্মক সংখ্যাকে বাইনারিতে রূপান্তর করুন এবং কয়টি 1-বিট আছে তা গুনুন।`,
+a:`Binary: repeatedly take n % 2 as the next bit (from the right) and divide by 2, then reverse. Set bits: n & (n − 1) clears the lowest 1-bit, so count how many times you can do that before n becomes 0.`,
+ab:`বাইনারি: বারবার n % 2 নিন (ডান দিক থেকে বিট) এবং 2 দিয়ে ভাগ করুন, শেষে উল্টে দিন। Set bit: n & (n − 1) সবচেয়ে ডানের 1-বিট মুছে দেয়; n শূন্য হওয়া পর্যন্ত কতবার করা যায় সেটাই উত্তর।`,
+cx:`O(log n) time for both.`,
+cpp:R`string toBinary(int n) {
+    if (n == 0) return "0";
+    string b;
+    while (n > 0) { b += char('0' + n % 2); n /= 2; }
+    reverse(b.begin(), b.end());
+    return b;
+}
+
+int countSetBits(int n) {
+    int c = 0;
+    while (n) { n &= n - 1; c++; }   // drop the lowest 1-bit
+    return c;
+}`,
+java:R`String toBinary(int n) {
+    if (n == 0) return "0";
+    StringBuilder b = new StringBuilder();
+    while (n > 0) { b.append(n % 2); n /= 2; }
+    return b.reverse().toString();
+}
+
+int countSetBits(int n) {
+    int c = 0;
+    while (n != 0) { n &= n - 1; c++; }
+    return c;
+}`,
+py:R`def to_binary(n):
+    if n == 0:
+        return "0"
+    b = ""
+    while n > 0:
+        b = str(n % 2) + b
+        n //= 2
+    return b
+
+def count_set_bits(n):
+    c = 0
+    while n:
+        n &= n - 1      # drop the lowest 1-bit
+        c += 1
+    return c`},
+
+{t:`Fast power (a^b mod m)`, d:`Medium`, p:`Divide & conquer`,
+s:`Compute a<sup>b</sup> mod m when b can be as large as 10<sup>18</sup>.`,
+ex:`Input:  a = 2, b = 10, m = 1000000007\nOutput: 1024`,
+sb:`b অনেক বড় (10^18 পর্যন্ত) হলেও a^b mod m দ্রুত বের করুন।`,
+a:`Use the binary form of b. Square a at each step; whenever the current bit of b is 1, multiply it into the result. Take mod after every multiplication so numbers stay small.`,
+ab:`b-এর বাইনারি রূপ ব্যবহার করুন। প্রতি ধাপে a-কে বর্গ করুন; b-এর বর্তমান বিট 1 হলে ফলাফলের সাথে গুণ করুন। প্রতিটি গুণের পর mod নিন যাতে সংখ্যা ছোট থাকে।`,
+cx:`O(log b) time instead of O(b).`,
+cpp:R`long long power(long long a, long long b, long long mod) {
+    long long res = 1;
+    a %= mod;
+    while (b > 0) {
+        if (b & 1) res = res * a % mod;   // this bit is 1
+        a = a * a % mod;
+        b >>= 1;
+    }
+    return res;
+}`,
+java:R`long power(long a, long b, long mod) {
+    long res = 1;
+    a %= mod;
+    while (b > 0) {
+        if ((b & 1) == 1) res = res * a % mod;
+        a = a * a % mod;
+        b >>= 1;
+    }
+    return res;
+}`,
+py:R`def power(a, b, mod):
+    res = 1
+    a %= mod
+    while b > 0:
+        if b & 1:
+            res = res * a % mod
+        a = a * a % mod
+        b >>= 1
+    return res
+
+# Python also has it built in: pow(a, b, mod)`},
+
+{t:`Climbing stairs`, d:`Easy`, p:`Dynamic programming`,
+s:`You can climb 1 or 2 steps at a time. How many different ways are there to reach step n?`,
+ex:`Input:  n = 5\nOutput: 8`,
+sb:`প্রতিবার ১ বা ২ ধাপ ওঠা যায়। n-তম ধাপে পৌঁছানোর কতগুলো ভিন্ন উপায় আছে?`,
+a:`To land on step n your last move came from n − 1 or n − 2, so ways(n) = ways(n − 1) + ways(n − 2): the Fibonacci pattern. Keep only the last two values instead of a whole table.`,
+ab:`n-তম ধাপে আসার আগে আপনি n − 1 বা n − 2 ধাপে ছিলেন, তাই ways(n) = ways(n − 1) + ways(n − 2) – এটা Fibonacci। পুরো টেবিলের বদলে শুধু শেষ দুটি মান রাখুন।`,
+cx:`O(n) time, O(1) space. Plain recursion without memoization would be O(2ⁿ).`,
+cpp:R`int climbStairs(int n) {
+    int a = 1, b = 1;            // ways(0), ways(1)
+    for (int i = 2; i <= n; i++) {
+        int c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}`,
+java:R`int climbStairs(int n) {
+    int a = 1, b = 1;            // ways(0), ways(1)
+    for (int i = 2; i <= n; i++) {
+        int c = a + b;
+        a = b;
+        b = c;
+    }
+    return b;
+}`,
+py:R`def climb_stairs(n):
+    a, b = 1, 1          # ways(0), ways(1)
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b`},
+
+{t:`Print a pyramid pattern`, d:`Easy`, p:`Nested loops`,
+s:`Print a centred pyramid of stars with n rows. Pattern questions are common in written tests in Bangladesh.`,
+ex:`Input:  n = 4\nOutput:\n   *\n  ***\n *****\n*******`,
+sb:`n সারির একটি মাঝখানে বসানো তারার পিরামিড প্রিন্ট করুন। বাংলাদেশের লিখিত পরীক্ষায় এমন প্যাটার্ন প্রশ্ন প্রায়ই আসে।`,
+a:`Row i (1-based) has n − i leading spaces and 2i − 1 stars. Work out the formula for spaces and stars per row first, then write the two inner loops.`,
+ab:`i-তম সারিতে (1 থেকে শুরু) n − i টি স্পেস আর 2i − 1 টি তারা। আগে প্রতি সারির স্পেস ও তারার সূত্র বের করুন, তারপর দুটি ভেতরের লুপ লিখুন।`,
+cx:`O(n²) time (that is the size of the output).`,
+cpp:R`void pyramid(int n) {
+    for (int i = 1; i <= n; i++) {
+        for (int s = 0; s < n - i; s++) cout << ' ';
+        for (int k = 0; k < 2 * i - 1; k++) cout << '*';
+        cout << '\n';
+    }
+}`,
+java:R`void pyramid(int n) {
+    for (int i = 1; i <= n; i++) {
+        for (int s = 0; s < n - i; s++) System.out.print(' ');
+        for (int k = 0; k < 2 * i - 1; k++) System.out.print('*');
+        System.out.println();
+    }
+}`,
+py:R`def pyramid(n):
+    for i in range(1, n + 1):
+        print(' ' * (n - i) + '*' * (2 * i - 1))`},
+
+/* ---------- Linked list, stack, queue, recursion ---------- */
+{t:`Reverse a linked list`, d:`Easy`, p:`Linked list`,
+s:`Reverse a singly linked list and return the new head.`,
+ex:`Input:  1 -> 2 -> 3 -> 4 -> null\nOutput: 4 -> 3 -> 2 -> 1 -> null`,
+sb:`একটি singly linked list উল্টে দিন এবং নতুন head ফেরত দিন।`,
+a:`Walk the list with prev (starts null) and cur. For each node: save next, point cur.next back to prev, then move prev and cur one step forward. When cur is null, prev is the new head.`,
+ab:`prev (শুরুতে null) ও cur নিয়ে লিস্ট ধরে এগোন। প্রতিটি নোডে: next সংরক্ষণ করুন, cur.next-কে prev-এর দিকে ঘুরিয়ে দিন, তারপর prev ও cur এক ধাপ এগিয়ে নিন। cur null হলে prev-ই নতুন head।`,
+cx:`O(n) time, O(1) space.`,
+cpp:R`struct Node {
+    int val;
+    Node* next;
+};
+
+Node* reverseList(Node* head) {
+    Node* prev = nullptr;
+    while (head) {
+        Node* next = head->next;   // save
+        head->next = prev;         // flip the link
+        prev = head;               // move forward
+        head = next;
+    }
+    return prev;
+}`,
+java:R`class Node {
+    int val; Node next;
+    Node(int v) { val = v; }
+}
+
+Node reverseList(Node head) {
+    Node prev = null;
+    while (head != null) {
+        Node next = head.next;     // save
+        head.next = prev;          // flip the link
+        prev = head;               // move forward
+        head = next;
+    }
+    return prev;
+}`,
+py:R`class Node:
+    def __init__(self, val, next=None):
+        self.val = val
+        self.next = next
+
+def reverse_list(head):
+    prev = None
+    while head:
+        nxt = head.next      # save
+        head.next = prev     # flip the link
+        prev = head          # move forward
+        head = nxt
+    return prev`},
+
+{t:`Detect a cycle in a linked list (and find the middle)`, d:`Easy`, p:`Fast & slow pointers`,
+s:`Return true if the linked list has a loop. Bonus: the same idea finds the middle node.`,
+ex:`Input:  1 -> 2 -> 3 -> 4 -> back to 2\nOutput: true`,
+sb:`Linked list-এ কোনো লুপ আছে কিনা বের করুন। একই কৌশলে মাঝের নোডও পাওয়া যায়।`,
+a:`Floyd's method: slow moves 1 step, fast moves 2 steps. If there is a loop, fast eventually laps slow and they meet. If fast reaches null, there is no loop. Without a loop, when fast reaches the end, slow is at the middle.`,
+ab:`Floyd-এর পদ্ধতি: slow এক ধাপ, fast দুই ধাপ এগোয়। লুপ থাকলে fast একসময় slow-কে ধরে ফেলে। fast null-এ পৌঁছালে লুপ নেই। লুপ না থাকলে fast শেষে পৌঁছানোর সময় slow থাকে ঠিক মাঝখানে।`,
+cx:`O(n) time, O(1) space (a hash set would need O(n) space).`,
+cpp:R`bool hasCycle(Node* head) {
+    Node *slow = head, *fast = head;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+
+Node* middle(Node* head) {         // list without a cycle
+    Node *slow = head, *fast = head;
+    while (fast && fast->next) { slow = slow->next; fast = fast->next->next; }
+    return slow;
+}`,
+java:R`boolean hasCycle(Node head) {
+    Node slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}
+
+Node middle(Node head) {           // list without a cycle
+    Node slow = head, fast = head;
+    while (fast != null && fast.next != null) { slow = slow.next; fast = fast.next.next; }
+    return slow;
+}`,
+py:R`def has_cycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False
+
+def middle(head):            # list without a cycle
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+    return slow`},
+
+{t:`Implement a queue using two stacks`, d:`Easy`, p:`Stack & queue`,
+s:`Build a FIFO queue (push, pop, peek, empty) using only two stacks.`,
+ex:`push(1), push(2), peek() -> 1, pop() -> 1, empty() -> false`,
+sb:`শুধু দুটি stack ব্যবহার করে একটি FIFO queue (push, pop, peek, empty) তৈরি করুন।`,
+a:`Push onto the "in" stack. To pop or peek, take from the "out" stack; if it is empty, first pour everything from "in" into "out", which reverses the order so the oldest item ends up on top.`,
+ab:`push সবসময় "in" stack-এ। pop বা peek করতে "out" stack থেকে নিন; সেটা খালি হলে আগে "in"-এর সব উপাদান "out"-এ ঢেলে দিন – এতে ক্রম উল্টে যায় এবং সবচেয়ে পুরনোটা উপরে আসে।`,
+cx:`Amortized O(1) per operation: each item moves between stacks at most once.`,
+cpp:R`class MyQueue {
+    stack<int> in, out;
+    void move() {
+        if (out.empty())
+            while (!in.empty()) { out.push(in.top()); in.pop(); }
+    }
+public:
+    void push(int x) { in.push(x); }
+    int pop()  { move(); int x = out.top(); out.pop(); return x; }
+    int peek() { move(); return out.top(); }
+    bool empty() { return in.empty() && out.empty(); }
+};`,
+java:R`class MyQueue {
+    private Deque<Integer> in = new ArrayDeque<>(), out = new ArrayDeque<>();
+    private void move() {
+        if (out.isEmpty())
+            while (!in.isEmpty()) out.push(in.pop());
+    }
+    public void push(int x) { in.push(x); }
+    public int pop()  { move(); return out.pop(); }
+    public int peek() { move(); return out.peek(); }
+    public boolean empty() { return in.isEmpty() && out.isEmpty(); }
+}`,
+py:R`class MyQueue:
+    def __init__(self):
+        self.inn, self.out = [], []
+
+    def _move(self):
+        if not self.out:
+            while self.inn:
+                self.out.append(self.inn.pop())
+
+    def push(self, x):
+        self.inn.append(x)
+
+    def pop(self):
+        self._move()
+        return self.out.pop()
+
+    def peek(self):
+        self._move()
+        return self.out[-1]
+
+    def empty(self):
+        return not self.inn and not self.out`},
+
+{t:`Generate all subsets (recursion / backtracking)`, d:`Medium`, p:`Backtracking`,
+s:`Return every subset of an array of distinct numbers.`,
+ex:`Input:  [1,2,3]\nOutput: [], [3], [2], [2,3], [1], [1,3], [1,2], [1,2,3]   (8 = 2³ subsets)`,
+sb:`ভিন্ন ভিন্ন সংখ্যার একটি অ্যারের সব subset বের করুন।`,
+a:`For each element there are two choices: leave it out or take it. Recurse on both choices; when you pass the last element, save the current subset. After the "take" branch, remove the element again (backtrack).`,
+ab:`প্রতিটি উপাদানের জন্য দুটি পথ: বাদ দেওয়া বা নেওয়া। দুই পথেই recursion চালান; শেষ উপাদান পার হলে বর্তমান subset সংরক্ষণ করুন। "নেওয়া" পথের পরে উপাদানটা আবার সরিয়ে দিন (backtrack)।`,
+cx:`O(n · 2ⁿ) time and output size.`,
+cpp:R`void build(const vector<int>& a, int i, vector<int>& cur,
+           vector<vector<int>>& res) {
+    if (i == (int)a.size()) { res.push_back(cur); return; }
+    build(a, i + 1, cur, res);        // skip a[i]
+    cur.push_back(a[i]);
+    build(a, i + 1, cur, res);        // take a[i]
+    cur.pop_back();                   // undo (backtrack)
+}
+
+vector<vector<int>> subsets(const vector<int>& a) {
+    vector<vector<int>> res;
+    vector<int> cur;
+    build(a, 0, cur, res);
+    return res;
+}`,
+java:R`void build(int[] a, int i, List<Integer> cur, List<List<Integer>> res) {
+    if (i == a.length) { res.add(new ArrayList<>(cur)); return; }
+    build(a, i + 1, cur, res);        // skip a[i]
+    cur.add(a[i]);
+    build(a, i + 1, cur, res);        // take a[i]
+    cur.remove(cur.size() - 1);       // undo (backtrack)
+}
+
+List<List<Integer>> subsets(int[] a) {
+    List<List<Integer>> res = new ArrayList<>();
+    build(a, 0, new ArrayList<>(), res);
+    return res;
+}`,
+py:R`def subsets(a):
+    res, cur = [], []
+
+    def build(i):
+        if i == len(a):
+            res.append(cur[:])
+            return
+        build(i + 1)          # skip a[i]
+        cur.append(a[i])
+        build(i + 1)          # take a[i]
+        cur.pop()             # undo (backtrack)
+
+    build(0)
+    return res`},
+];
+function cpHTML(p){
+  return '<details class="cp-sol"><summary>Show solution <span class="bn-i">· সমাধান দেখুন</span></summary>'
+   + '<div class="en"><span class="lbl">Approach</span><p>'+p.a+'</p></div>'
+   + '<div class="bn"><span class="lbl">সমাধানের ধারণা</span><p>'+p.ab+'</p></div>'
+   + '<div class="cp-tabs" role="group" aria-label="Code language"><button data-cl="cpp">C++</button><button data-cl="java">Java</button><button data-cl="py">Python</button><button class="cp-copy" type="button">Copy</button></div>'
+   + '<div class="cp-code">'+['cpp','java','py'].map(l=>'<pre class="'+l+'"><code>'+escH(p[l])+'</code></pre>').join('')+'</div>'
+   + '<p class="cp-cx"><b>Complexity:</b> '+p.cx+'</p></details>';
+}
+T.splice(T.findIndex(t=>t.id==='intern')+1, 0, {id:'coding', title:'★ Coding Problems with Solutions',
+  sub:CODING.length+' string, array, math, linked-list and recursion problems at BS23 coding-test level. Try each one first, then open the solution (C++, Java or Python)',
+  subBn:'প্রতিটি সমস্যা আগে নিজে চেষ্টা করুন, তারপর সমাধান দেখুন (C++, Java বা Python)',
+  qs:CODING.map(p=>({q:p.t, rep:p.rep, cp:p,
+    en:'<p>'+p.s+'</p><pre class="cp-ex"><code>'+escH(p.ex)+'</code></pre>',
+    bn:'<p>'+p.sb+'</p>'}))});
+
 /* ---------- render ---------- */
 const main = document.getElementById('main'), toc = document.getElementById('toc');
 let n = 0;
@@ -1420,9 +2670,13 @@ T.forEach(t => {
     n++;
     const vm = VIZMAP.find(m => q.q.startsWith(m[0]));
     const c = document.createElement('article'); c.className='card'; c.id='q'+n; c.dataset.rep = q.rep?1:0; c.dataset.viz = vm?1:0;
-    c.innerHTML = '<h3><span class="n">Q'+n+'</span>'+q.q+(q.rep?' <span class="tag">Reported</span>':'')+(vm?' <span class="tag anim">Animated</span>':'')+'</h3>'
-      + '<div class="en"><span class="lbl">English</span>'+q.en+'</div>'
-      + '<div class="bn"><span class="lbl">বাংলা ব্যাখ্যা</span>'+q.bn+'</div>';
+    const cp = q.cp;
+    c.innerHTML = '<h3><span class="n">'+(cp?'P':'Q')+n+'</span>'+q.q+(q.rep?' <span class="tag">Reported</span>':'')+(vm?' <span class="tag anim">Animated</span>':'')
+      + (cp?' <span class="tag '+(cp.d==='Easy'?'easy':'med')+'">'+cp.d+'</span> <span class="tag pat">'+cp.p+'</span><label class="cp-done"><input type="checkbox" data-solved="'+escH(cp.t)+'"> Solved</label>':'')+'</h3>'
+      + '<div class="en"><span class="lbl">'+(cp?'Problem':'English')+'</span>'+q.en+'</div>'
+      + '<div class="bn"><span class="lbl">'+(cp?'সমস্যা':'বাংলা ব্যাখ্যা')+'</span>'+q.bn+'</div>'
+      + (cp?cpHTML(cp):'');
+    if (cp) c.classList.add('cp');
     c.dataset.text = c.textContent.toLowerCase();
     if (vm){ const v = document.createElement('div'); c.querySelector('h3').after(v);
       try{ mountViz(v, vm[1]); ANIMS.push([n, vm[2]]); }catch(err){ v.remove(); console.error(err); } }
@@ -1447,7 +2701,33 @@ src.innerHTML = '<h2>Sources</h2><p class="sub">Interview reports this guide is 
  + '</ul></div>';
 main.appendChild(src);
 const sa = document.createElement('a'); sa.href='#sources'; sa.innerHTML='Sources<span>8</span>'; toc.appendChild(sa);
-document.getElementById('anims').innerHTML = '<span>▶ '+ANIMS.length+' animated walkthroughs:</span>' + ANIMS.map(([k,t]) => '<a href="#q'+k+'">'+t+'</a>').join('');
+/* coding problems: language tabs, copy, solved tracking */
+(function(){
+  let lang='cpp'; try{ lang=localStorage.getItem('bs23-code')||'cpp'; }catch(e){}
+  document.body.dataset.code=lang;
+  let solved=[]; try{ solved=JSON.parse(localStorage.getItem('bs23-solved')||'[]'); }catch(e){}
+  const sec=document.getElementById('coding');
+  const prog=document.createElement('div'); prog.className='cp-prog'; sec.querySelector('.sub').after(prog);
+  const total=sec.querySelectorAll('[data-solved]').length;
+  function upd(){ const k=solved.length; prog.innerHTML='<span>Solved <b>'+k+'</b> / '+total+' <span class="bn-i">সমাধান করেছেন</span></span><div class="cp-bar"><i style="width:'+(k/total*100)+'%"></i></div>'; }
+  sec.querySelectorAll('[data-solved]').forEach(cb=>{ cb.checked=solved.includes(cb.dataset.solved);
+    cb.addEventListener('change',()=>{ const t=cb.dataset.solved; solved=solved.filter(x=>x!==t); if(cb.checked) solved.push(t);
+      try{ localStorage.setItem('bs23-solved',JSON.stringify(solved)); }catch(e){} cb.closest('.card').classList.toggle('solved',cb.checked); upd(); });
+    cb.closest('.card').classList.toggle('solved',cb.checked); });
+  solved=solved.filter(t=>sec.querySelector('[data-solved="'+CSS.escape(t)+'"]'));
+  upd();
+  sec.addEventListener('click',e=>{
+    const tab=e.target.closest('[data-cl]');
+    if(tab){ document.body.dataset.code=tab.dataset.cl; try{ localStorage.setItem('bs23-code',tab.dataset.cl); }catch(err){} return; }
+    const cpb=e.target.closest('.cp-copy');
+    if(cpb){ const pre=cpb.closest('.cp-sol').querySelector('.cp-code pre.'+document.body.dataset.code);
+      const done=()=>{ cpb.textContent='Copied ✓'; setTimeout(()=>cpb.textContent='Copy',1500); };
+      if(navigator.clipboard) navigator.clipboard.writeText(pre.textContent).then(done,()=>{ cpb.textContent='Copy failed'; setTimeout(()=>cpb.textContent='Copy',1500); });
+    }
+  });
+})();
+document.getElementById('anims').insertAdjacentHTML('beforebegin','<a class="cta" href="#coding" style="margin-right:8px">💻 '+CODING.length+' coding problems with solutions</a>');
+document.getElementById('anims').innerHTML ='<span>▶ '+ANIMS.length+' animated walkthroughs:</span>' + ANIMS.map(([k,t]) => '<a href="#q'+k+'">'+t+'</a>').join('');
 
 /* ================= MOCK TEST (MCQ + timer) ================= */
 (function(){
